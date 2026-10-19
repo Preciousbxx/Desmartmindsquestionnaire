@@ -1,0 +1,78 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Desmartminds Brand Discovery Questionnaire</title>
+<style>
+:root{--bg:#0e1014;--fg:#f4f4f5;--mut:#9aa0ab;--ac:#e8b04a;--line:#2a2e37}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+#bar{height:4px;background:var(--line)}#bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .4s}
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px}
+.step{max-width:680px;width:100%;animation:in .35s ease}@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.sec{color:var(--ac);font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+h1{font-size:clamp(26px,5vw,38px);line-height:1.2;margin:0 0 12px}h2{font-size:clamp(21px,4vw,28px);line-height:1.25;margin:0 0 10px}
+.help,.intro{color:var(--mut);white-space:pre-line;margin:0 0 20px}
+textarea,input{width:100%;background:transparent;border:0;border-bottom:2px solid var(--line);color:var(--fg);font:inherit;font-size:18px;padding:10px 2px;outline:0}
+textarea{min-height:160px;border:2px solid var(--line);border-radius:10px;padding:12px;resize:vertical}
+textarea:focus,input:focus{border-color:var(--ac)}
+.row{display:flex;gap:12px;align-items:center;margin-top:26px;flex-wrap:wrap}
+.go{background:var(--ac);color:#111;border:0;border-radius:10px;padding:12px 24px;font:600 16px system-ui;cursor:pointer}.bk{background:none;border:0;color:var(--mut);cursor:pointer;font:inherit}
+.hint{color:var(--mut);font-size:13px}.err{color:#ff7a7a;font-size:14px;margin-top:10px;min-height:1em}
+label{display:block;color:var(--mut);font-size:14px;margin:18px 0 0}
+</style></head><body><div id="bar"><i></i></div><main><div class="step" id="s"></div></main>
+<script>
+// ===== SETTINGS (optional) =====
+// Optional (leave empty): a Formspree URL. If empty, answers are emailed to EMAIL below via FormSubmit.co (no account needed)
+const FORMSPREE_URL = "https://formsubmit.co/ajax/crypticp.studio@gmail.com";
+// Where answers are sent
+const EMAIL = "crypticp.studio@gmail.com";
+// ===============================
+const TITLE="Desmartminds Brand Discovery Questionnaire";
+const INTRO="Before we begin designing the visual identity for Desmartminds, I'd like to understand the business beyond its name, services, and visual preferences.\n\nPlease answer as openly and thoughtfully as you can. There are no right or wrong answers. The more context you provide, the better I can build an identity that serves the business strategically.";
+const BYLINE="Prepared by Precious Baridoosia | IGNITE™ Brand Identity Framework";
+const THANKS="Thank you for taking the time to complete this questionnaire. Your responses will form the foundation of the discovery process and guide the next stages of the IGNITE™ Framework.";
+const Q=[
+["Business Foundation","Tell me about Desmartminds.","What inspired you to start the company, what problem does it exist to solve, and what does the name Desmartminds mean to you?",1],
+["Business Foundation","What does Desmartminds currently do, and what do you envision it becoming?","Outline the services you currently offer, including those in development or planned. Explain how the different arms (branding, research, consulting, academy, call services) fit together under the Desmartminds name.",1],
+["Vision & Business Goals","What are the most important things you want Desmartminds to achieve over the next three to five years?","Consider growth, market presence, clientele, reputation, and expansion into new services or markets. What would make you look back and consider the business successful?",1],
+["Vision & Business Goals","Why are you developing this brand identity now, and what do you want it to help you achieve?","What prompted the project at this time? Are there existing challenges with how Desmartminds looks, communicates, or is perceived? What would you like to improve or change?",1],
+["Audience & Market","Who does Desmartminds primarily serve, and who do you most want to attract?","Describe your ideal clients: the types of businesses or individuals, their needs, the problems they face, and what they value when choosing a company like yours. If the arms serve different audiences, highlight the differences.",1],
+["Audience & Market","Why should someone choose Desmartminds over other businesses offering similar services?","What makes the company different: approach, expertise, service delivery, philosophy, customer experience, or results? Share any client work, testimonials or achievements, and mention competitors or brands you admire.",1],
+["Brand Perception & Identity","How do you want people to perceive Desmartminds when they encounter the brand?","The brief describes the personality as intelligent, strategic, sharp, confident, premium, ambitious, human, and results-driven. Which three matter most, and why? Are there perceptions you want to avoid?",1],
+["Brand Perception & Identity","The philosophy \"Grow until the old you gets jealous of the new you\" appears in the brief. What does it mean to Desmartminds?","Is it a core philosophy guiding the whole company, a message for a particular audience, or a motivational statement for brand communication? If Desmartminds were remembered for just one defining idea, what would it be?",1],
+["Existing Materials & Practical Requirements","Are there any existing brand materials or business resources I should review?","Share links or files for your current logo, website, social media, presentations, company profile, service documents, or any logo sketches and references related to the trophy concept.",0],
+["Existing Materials & Practical Requirements","Which platforms or applications will be the highest priority for the new identity?","For example: social media, website, business proposals, presentations, research reports, academy materials, case studies. Mention upcoming launches, deadlines or specific requirements.",1]
+];
+const $=s=>document.querySelector(s),esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const N=Q.length;let i=0,ans=[],c={name:"",email:""};
+try{const s=JSON.parse(localStorage.getItem("dm")||"null");if(s){ans=s.ans||[];c=s.c||c;i=0}}catch(e){}
+const save=()=>{try{localStorage.setItem("dm",JSON.stringify({ans,c,i}))}catch(e){}};
+function render(){
+  let h="";$("#bar i").style.width=(i/(N+1)*100)+"%";
+  if(i===0)h=`<h1>${esc(TITLE)}</h1><p class="intro">${esc(INTRO)}</p><p class="hint">${esc(BYLINE)}</p><div class="row"><button class="go" onclick="nx()">Begin →</button><span class="hint">${N} questions · about 10 minutes</span></div>`;
+  else if(i<=N){const k=i-1,q=Q[k];h=`<div class="sec">${esc(q[0])}</div><h2>${i}. ${esc(q[1])}</h2><p class="help">${esc(q[2])}</p><textarea id="f" placeholder="Type your answer here…" oninput="ans[${k}]=this.value;save()">${esc(ans[k]||"")}</textarea><div class="err" id="e"></div><div class="row"><button class="go" onclick="nx()">OK ✓</button><button class="bk" onclick="bk()">← Back</button><span class="hint">Ctrl/⌘ + Enter to continue</span></div>`;}
+  else if(i===N+1)h=`<h2>Last step — who is this from?</h2><label>Your name</label><input id="f" value="${esc(c.name)}" oninput="c.name=this.value;save()"><label>Your email</label><input type="email" value="${esc(c.email)}" oninput="c.email=this.value;save()"><div class="err" id="e"></div><div class="row"><button class="go" id="b" onclick="sub()">Submit</button><button class="bk" onclick="bk()">← Back</button></div>`;
+  else{h=`<h1>Thank you 🎉</h1><p class="intro">${esc(THANKS)}</p>`;$("#bar i").style.width="100%"}
+  $("#s").innerHTML=h;const f=$("#f");if(f)f.focus();
+}
+function nx(){if(i>=1&&i<=N&&Q[i-1][3]&&!(ans[i-1]||"").trim()){$("#e").textContent="This question is required.";return}i++;save();render()}
+function bk(){if(i>0){i--;save();render()}}
+function text(){return TITLE+"\nFrom: "+c.name+" <"+c.email+">\n\n"+Q.map((q,k)=>(k+1)+". "+q[1]+"\n"+(ans[k]||"—")).join("\n\n")}
+async function sub(){
+  const e=$("#e");if(!c.name.trim()||!/^\S+@\S+\.\S+$/.test(c.email)){e.textContent="Please enter your name and a valid email.";return}
+  $("#b").disabled=true;
+  try{
+    const url=FORMSPREE_URL||(EMAIL?"https://formsubmit.co/ajax/"+EMAIL:"");
+    let sent=false;
+    if(url){
+      try{
+        const body={name:c.name,email:c.email,_subject:TITLE+" — "+c.name,_template:"table"};Q.forEach((q,k)=>body[(k+1)+". "+q[1]]=ans[k]||"");
+        const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(body)});sent=r.ok;
+      }catch(x){}
+    }
+    if(!sent){
+      const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text()],{type:"text/plain"}));a.download="desmartminds-questionnaire.txt";a.click();
+      if(EMAIL)location.href="mailto:"+EMAIL+"?subject="+encodeURIComponent(TITLE+" — "+c.name)+"&body="+encodeURIComponent(text().slice(0,1800)+"\n\n(Full answers attached as the downloaded .txt file)");
+    }
+    localStorage.removeItem("dm");i=N+2;render();
+  }catch(x){e.textContent="Something went wrong. Please try again.";$("#b").disabled=false}
+}
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&i>=0&&i<=N&&(i===0||e.ctrlKey||e.metaKey)){e.preventDefault();nx()}});
+render();
+</script></body></html>
